@@ -48,6 +48,15 @@ class DataStore:
         # Drop unnamed trailing columns introduced by extra pivot table in the sheet
         self.retailers = self.retailers.loc[:, ~self.retailers.columns.str.startswith("Unnamed")]
 
+        # Strip whitespace from string ID columns to prevent lookup misses
+        for df, col in [
+            (self.retailers, "retailer_id"),
+            (self.growers,   "tehsil"),
+            (self.retailers, "tehsil"),
+        ]:
+            if col in df.columns:
+                df[col] = df[col].astype(str).str.strip()
+
         self.growers["grower_crop_calendar"] = self.growers["grower_crop_calendar"].apply(
             lambda x: json.loads(x) if isinstance(x, str) else (x if isinstance(x, dict) else {})
         )

@@ -7,7 +7,7 @@ import InventorySection from './InventorySection'
 export default function SituationBriefCard({ brief }) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 animate-fade-in">
         <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">
           30-Second Situation Brief
         </span>
@@ -15,21 +15,31 @@ export default function SituationBriefCard({ brief }) {
         <span className="text-xs font-medium text-gray-500">{brief.tehsil}</span>
       </div>
 
-      <ConversationOpener text={brief.conversation_opener} />
+      <div className="animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+        <ConversationOpener text={brief.conversation_opener} />
+      </div>
 
-      <FieldSituationSection
-        crop={brief.dominant_crop}
-        stage={brief.current_stage}
-        products={brief.recommended_products}
-      />
+      <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+        <FieldSituationSection
+          crop={brief.dominant_crop}
+          stage={brief.current_stage}
+          products={brief.recommended_products}
+        />
+      </div>
 
       {brief.digital_signals && (
-        <DigitalSignalsSection signals={brief.digital_signals} />
+        <div className="animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+          <DigitalSignalsSection signals={brief.digital_signals} />
+        </div>
       )}
 
-      <InventorySection items={brief.inventory} />
+      <div className="animate-fade-in-up" style={{ animationDelay: '240ms' }}>
+        <InventorySection items={brief.inventory} />
+      </div>
 
-      <GrowerScanFlags flags={brief.grower_scan_flags} />
+      <div className="animate-fade-in-up" style={{ animationDelay: '320ms' }}>
+        <GrowerScanFlags flags={brief.grower_scan_flags} />
+      </div>
     </div>
   )
 }

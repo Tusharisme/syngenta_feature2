@@ -1,12 +1,13 @@
 const STATUS = {
-  well_stocked:  { label: 'Well Stocked',           dot: 'bg-green-500',  text: 'text-green-700',  bg: 'bg-green-50 border border-green-100' },
-  low_stock:     { label: 'Low Stock — Close Today', dot: 'bg-amber-500',  text: 'text-amber-700',  bg: 'bg-amber-50 border border-amber-100' },
-  zero_movement: { label: 'Zero Movement',           dot: 'bg-red-400',    text: 'text-red-600',    bg: 'bg-red-50 border border-red-100' },
+  well_stocked:  { label: 'Well Stocked',           dot: 'bg-green-500',  text: 'text-green-700',  bg: 'bg-green-50 border border-green-100 hover:bg-green-100' },
+  low_stock:     { label: 'Low Stock — Close Today', dot: 'bg-amber-500',  text: 'text-amber-700',  bg: 'bg-amber-50 border border-amber-100 hover:bg-amber-100' },
+  zero_movement: { label: 'Zero Movement',           dot: 'bg-red-400',    text: 'text-red-600',    bg: 'bg-red-50 border border-red-100 hover:bg-red-100' },
 }
 
 export default function InventorySection({ items }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 p-5 shadow-sm
+      hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <h2 className="text-xs font-semibold uppercase tracking-widest text-amber-700 mb-3">
         What the Shelf Looks Like
       </h2>
@@ -16,7 +17,7 @@ export default function InventorySection({ items }) {
           return (
             <div
               key={item.sku_id}
-              className={`flex items-center justify-between rounded-lg px-3 py-2 ${cfg.bg}`}
+              className={`flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 ${cfg.bg}`}
             >
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot}`} />

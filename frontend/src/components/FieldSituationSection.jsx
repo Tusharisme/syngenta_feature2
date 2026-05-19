@@ -1,7 +1,8 @@
 export default function FieldSituationSection({ crop, stage, products }) {
   const stageLabel = stage.replace(/_/g, ' ')
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 p-5 shadow-sm
+      hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <h2 className="text-xs font-semibold uppercase tracking-widest text-green-700 mb-3">
         What's Happening Here Right Now
       </h2>
@@ -15,14 +16,13 @@ export default function FieldSituationSection({ crop, stage, products }) {
       </div>
       {products.length > 0 ? (
         <div>
-          <p className="text-xs text-gray-400 uppercase tracking-widest mb-2">
-            Recommended this stage
-          </p>
+          <p className="text-xs text-gray-400 uppercase tracking-widest mb-2">Recommended this stage</p>
           <div className="flex flex-wrap gap-2">
             {products.map(p => (
               <span
                 key={p}
-                className="bg-gray-100 border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium"
+                className="bg-gray-100 border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium
+                  hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition-colors duration-150 cursor-default"
               >
                 {p}
               </span>

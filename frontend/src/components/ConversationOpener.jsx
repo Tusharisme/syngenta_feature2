@@ -1,6 +1,7 @@
 export default function ConversationOpener({ text }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-green-100 p-5 shadow-sm
+      hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <div className="flex items-center gap-2 mb-3">
         <svg className="w-3.5 h-3.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path

@@ -51,3 +51,31 @@ def test_digital_signals_returns_none_when_no_products():
     import pandas as pd
     signals = _digital_signals(pd.DataFrame(), pd.DataFrame(), "wheat", [])
     assert signals is None
+
+
+from brief_builder import _inventory_status
+from tests.conftest import RETAILER_ID
+
+
+def test_inventory_well_stocked(mock_inventory, mock_pos):
+    items = _inventory_status(RETAILER_ID, mock_inventory, mock_pos, date(2026, 1, 20))
+    tilt = next(i for i in items if i.sku_id == "SY_TILT_250EC")
+    assert tilt.status == "well_stocked"
+    assert tilt.qty == 94
+
+
+def test_inventory_low_stock(mock_inventory, mock_pos):
+    items = _inventory_status(RETAILER_ID, mock_inventory, mock_pos, date(2026, 1, 20))
+    score = next(i for i in items if i.sku_id == "SY_SCO_250EC")
+    assert score.status == "low_stock"
+
+
+def test_inventory_zero_movement(mock_inventory, mock_pos):
+    items = _inventory_status(RETAILER_ID, mock_inventory, mock_pos, date(2026, 1, 20))
+    axial = next(i for i in items if i.sku_id == "SY_AXI_50EC")
+    assert axial.status == "zero_movement"
+
+
+def test_inventory_unknown_retailer_returns_empty(mock_inventory, mock_pos):
+    items = _inventory_status("RTL_UNKNOWN", mock_inventory, mock_pos, date(2026, 1, 20))
+    assert items == []

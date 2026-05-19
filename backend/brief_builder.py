@@ -67,3 +67,49 @@ def _digital_signals(
         open_rate=round(opens / total, 3) if total > 0 else 0.0,
         click_count=clicks,
     )
+
+
+def _inventory_status(
+    retailer_id: str,
+    inventory: pd.DataFrame,
+    pos: pd.DataFrame,
+    visit_date: date,
+) -> list[InventoryItem]:
+    ret_inv = inventory[inventory["retailer_id"] == retailer_id]
+    if ret_inv.empty:
+        return []
+
+    latest_week = ret_inv["week_end_date"].max()
+    current = ret_inv[ret_inv["week_end_date"] == latest_week][
+        ["sku_id", "sku_name", "sku_qty"]
+    ].copy()
+
+    cutoff = pd.Timestamp(visit_date) - pd.Timedelta(days=28)
+    recent_pos = pos[
+        (pos["retailer_id"] == retailer_id) & (pos["transaction_date"] >= cutoff)
+    ]
+    sales = recent_pos.groupby("sku_id")["sku_qty"].sum().reset_index()
+    sales.columns = ["sku_id", "units_sold_28d"]
+
+    merged = current.merge(sales, on="sku_id", how="left")
+    merged["units_sold_28d"] = merged["units_sold_28d"].fillna(0).astype(int)
+
+    items: list[InventoryItem] = []
+    for _, row in merged.iterrows():
+        qty  = int(row["sku_qty"])
+        sold = int(row["units_sold_28d"])
+        if sold == 0:
+            status = "zero_movement"
+        elif qty < 50:
+            status = "low_stock"
+        else:
+            status = "well_stocked"
+        items.append(InventoryItem(
+            sku_id=str(row["sku_id"]),
+            sku_name=str(row["sku_name"]),
+            qty=qty,
+            status=status,
+        ))
+
+    order = {"low_stock": 0, "well_stocked": 1, "zero_movement": 2}
+    return sorted(items, key=lambda i: order[i.status])

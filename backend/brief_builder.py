@@ -113,3 +113,69 @@ def _inventory_status(
 
     order = {"low_stock": 0, "well_stocked": 1, "zero_movement": 2}
     return sorted(items, key=lambda i: order[i.status])
+
+
+def _grower_scan_flags(tehsil_growers: pd.DataFrame) -> list[GrowerScanFlag]:
+    flags: list[GrowerScanFlag] = []
+    for _, row in tehsil_growers.iterrows():
+        scan_val = row.get("product_scan", 0)
+        product  = row.get("product_name")
+        scan_dt  = row.get("product_scan_datetime")
+        if scan_val and product and not pd.isna(product):
+            scan_date = str(scan_dt)[:10] if scan_dt and not pd.isna(scan_dt) else "unknown"
+            flags.append(GrowerScanFlag(
+                grower_id=str(row["grower_id"]),
+                product_scanned=str(product),
+                scan_date=scan_date,
+            ))
+    return flags
+
+
+_DISEASE_HINTS: dict[tuple[str, str], str] = {
+    ("wheat",    "early_growth"): "weed pressure",
+    ("wheat",    "tillering"):    "weed pressure",
+    ("wheat",    "flowering"):    "leaf blight",
+    ("wheat",    "harvest"):      "grain quality",
+    ("chickpea", "flowering"):    "botrytis blight",
+    ("mustard",  "flowering"):    "white rust",
+    ("mustard",  "vegetative"):   "aphid pressure",
+    ("barley",   "tillering"):    "net blotch",
+    ("potato",   "vegetative"):   "early blight",
+    ("lentil",   "flowering"):    "powdery mildew",
+}
+
+
+def _conversation_opener(
+    crop: str,
+    stage: str,
+    digital: Optional[DigitalSignals],
+    inventory: list[InventoryItem],
+    tehsil: str,
+) -> str:
+    push_item = next(
+        (i for i in inventory if i.status == "low_stock"), None
+    ) or next(
+        (i for i in inventory if i.status == "well_stocked"), None
+    )
+
+    disease_hint = _DISEASE_HINTS.get((crop.lower(), stage.lower()), f"{stage} protection")
+
+    if digital and push_item:
+        qty_note = "good position" if push_item.status == "well_stocked" else "running low — close today"
+        return (
+            f"Are your {crop} farmers asking about {disease_hint} yet? "
+            f"We've been running awareness on {digital.campaign_product} — "
+            f"{digital.open_count} farmers in your tehsil opened the message. "
+            f"You have {push_item.qty} units, {qty_note}. Worth pushing this week."
+        )
+    elif push_item:
+        return (
+            f"Your {crop} farmers are in the {stage.replace('_', ' ')} stage right now. "
+            f"{push_item.sku_name} is {'well stocked' if push_item.status == 'well_stocked' else 'running low'} "
+            f"at {push_item.qty} units — good time to move it."
+        )
+    else:
+        return (
+            f"Let's talk about your {crop} inventory for the "
+            f"{stage.replace('_', ' ')} season. Some products need attention."
+        )

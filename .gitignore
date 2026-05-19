@@ -1,0 +1,10 @@
+frontend/node_modules/
+backend/.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+backend/uvicorn.log
+backend/uvicorn_err.log
+dist/
+.DS_Store

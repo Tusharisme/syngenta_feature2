@@ -24,3 +24,30 @@ def test_current_stage_for_crop_flowering(mock_growers):
 def test_current_stage_for_unknown_crop(mock_growers):
     stage = _current_stage_for_crop(mock_growers, "mango", date(2026, 1, 20))
     assert stage == "unknown"
+
+
+from brief_builder import _digital_signals
+
+
+def test_digital_signals_returns_correct_open_count(mock_growers, mock_campaigns):
+    signals = _digital_signals(mock_growers, mock_campaigns, "wheat", ["Tilt 250 EC"])
+    assert signals is not None
+    assert signals.open_count == 1
+    assert signals.total_sent == 2
+    assert signals.campaign_product == "Tilt 250 EC"
+
+
+def test_digital_signals_open_rate(mock_growers, mock_campaigns):
+    signals = _digital_signals(mock_growers, mock_campaigns, "wheat", ["Tilt 250 EC"])
+    assert signals.open_rate == 0.5
+
+
+def test_digital_signals_returns_none_when_no_campaigns(mock_growers, mock_campaigns):
+    signals = _digital_signals(mock_growers, mock_campaigns, "mango", ["Tilt 250 EC"])
+    assert signals is None
+
+
+def test_digital_signals_returns_none_when_no_products():
+    import pandas as pd
+    signals = _digital_signals(pd.DataFrame(), pd.DataFrame(), "wheat", [])
+    assert signals is None

@@ -179,3 +179,43 @@ def _conversation_opener(
             f"Let's talk about your {crop} inventory for the "
             f"{stage.replace('_', ' ')} season. Some products need attention."
         )
+
+
+def build_brief(
+    retailer_id: str,
+    growers: pd.DataFrame,
+    campaigns: pd.DataFrame,
+    retailers: pd.DataFrame,
+    inventory: pd.DataFrame,
+    pos: pd.DataFrame,
+    visit_date: Optional[date] = None,
+) -> SituationBrief:
+    if visit_date is None:
+        visit_date = date.today()
+
+    retailer_row = retailers[retailers["retailer_id"] == retailer_id]
+    if retailer_row.empty:
+        raise ValueError(f"Retailer '{retailer_id}' not found")
+
+    tehsil = str(retailer_row.iloc[0]["tehsil"])
+    tehsil_growers = growers[growers["tehsil"] == tehsil]
+
+    dominant_crop = _dominant_crop(tehsil_growers)
+    current_stage = _current_stage_for_crop(tehsil_growers, dominant_crop, visit_date)
+    rec_products  = recommended_products(dominant_crop, current_stage)
+    digital       = _digital_signals(tehsil_growers, campaigns, dominant_crop, rec_products)
+    inv_items     = _inventory_status(retailer_id, inventory, pos, visit_date)
+    scan_flags    = _grower_scan_flags(tehsil_growers)
+    opener        = _conversation_opener(dominant_crop, current_stage, digital, inv_items, tehsil)
+
+    return SituationBrief(
+        retailer_id=retailer_id,
+        tehsil=tehsil,
+        dominant_crop=dominant_crop,
+        current_stage=current_stage,
+        recommended_products=rec_products,
+        digital_signals=digital,
+        inventory=inv_items,
+        grower_scan_flags=scan_flags,
+        conversation_opener=opener,
+    )

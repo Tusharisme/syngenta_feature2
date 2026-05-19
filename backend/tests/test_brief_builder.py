@@ -121,3 +121,39 @@ def test_conversation_opener_fallback_no_digital():
     opener = _conversation_opener("wheat", "tillering", None, inventory, "Agra_T001")
     assert "wheat" in opener.lower()
     assert len(opener) > 20
+
+
+from brief_builder import build_brief
+import pytest
+
+
+def test_build_brief_end_to_end(mock_growers, mock_retailers, mock_campaigns, mock_inventory, mock_pos):
+    brief = build_brief(
+        retailer_id="RTL_00001",
+        growers=mock_growers,
+        campaigns=mock_campaigns,
+        retailers=mock_retailers,
+        inventory=mock_inventory,
+        pos=mock_pos,
+        visit_date=date(2026, 1, 20),
+    )
+    assert brief.retailer_id == "RTL_00001"
+    assert brief.dominant_crop == "wheat"
+    assert brief.current_stage == "tillering"
+    assert len(brief.inventory) == 3
+    assert brief.digital_signals is not None
+    assert len(brief.grower_scan_flags) == 1
+    assert len(brief.conversation_opener) > 30
+
+
+def test_build_brief_raises_for_unknown_retailer(mock_growers, mock_retailers, mock_campaigns, mock_inventory, mock_pos):
+    with pytest.raises(ValueError, match="not found"):
+        build_brief(
+            retailer_id="RTL_UNKNOWN",
+            growers=mock_growers,
+            campaigns=mock_campaigns,
+            retailers=mock_retailers,
+            inventory=mock_inventory,
+            pos=mock_pos,
+            visit_date=date(2026, 1, 20),
+        )

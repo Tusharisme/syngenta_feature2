@@ -6,5 +6,10 @@ __pycache__/
 .pytest_cache/
 backend/uvicorn.log
 backend/uvicorn_err.log
+frontend/vite.log
+frontend/vite_err.log
 dist/
 .DS_Store
+*.xlsx
+*.pdf
+.claude/

@@ -17,7 +17,7 @@ SHEET_NAMES = {
 # row 1 = actual column names), so header=1 skips the spurious first row.
 DOUBLE_HEADER_SHEETS = {"retailers", "reps_territory"}
 
-EXCEL_PATH = Path(__file__).parent.parent / "Syngenta.xlsx"
+EXCEL_PATH = Path(__file__).parent / "Syngenta.xlsx"
 
 
 class DataStore:

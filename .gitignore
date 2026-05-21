@@ -10,6 +10,5 @@ frontend/vite.log
 frontend/vite_err.log
 dist/
 .DS_Store
-*.xlsx
 *.pdf
 .claude/
